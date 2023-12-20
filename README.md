@@ -23,7 +23,7 @@ sendVoice.closeFile();
 
 
 ## 서버코드 파일저장위치 전송완료 콜백 가능
-'''python
+```python
 import socket
 import threading
 
