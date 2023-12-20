@@ -136,7 +136,7 @@ void I2SAudioSender::_clearI2sBus()
 
 void I2SAudioSender::_sendOpenFileProtocol()
 {
-    uint16_t signal_start = 3000;
+    uint16_t signal_start = 3006;
     memcpy(this->dataBuffer, &signal_start, sizeof(signal_start));
     memcpy(this->dataBuffer + 2, this->mac, 6);
     this->client->write(this->dataBuffer, 1026);
