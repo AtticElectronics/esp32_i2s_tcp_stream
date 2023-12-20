@@ -29,5 +29,4 @@ if __name__ == "__main__":
     server2 = ESPTCPServer('0.0.0.0', 33820, ESP32TCPAudioRecv)
     server1.start()
     server2.start()
-start_server('0.0.0.0', 33823)
 ```
