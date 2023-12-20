@@ -24,31 +24,10 @@ sendVoice.closeFile();
 
 ## 서버코드 파일저장위치 전송완료 콜백 가능
 ```python
-import socket
-import threading
-
-def OnClosedSocket():
-    print("닫힘 콜백함수")
-
-def start_server(host, port):
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((host, port))
-    server_socket.listen(5)
-    print(f"Server is listening on port {port}")
-    try:
-        while True:
-            try:
-                client_socket, client_address = server_socket.accept()
-                print(f"Connected to {client_address}")
-                audio_stream_server = ESP32AudioStreamServer(client_socket, client_address, OnClosedSocket)
-                client_thread = threading.Thread(target=audio_stream_server.start)
-                client_thread.start()
-            except Exception as e:
-                print(f"Connection error: {e}")
-    finally:
-        server_socket.close()
-        print("Server closed")
-
-
+if __name__ == "__main__":
+    server1 = ESPTCPServer('0.0.0.0', 33819, ESPTCPAudioSend)
+    server2 = ESPTCPServer('0.0.0.0', 33820, ESP32TCPAudioRecv)
+    server1.start()
+    server2.start()
 start_server('0.0.0.0', 33823)
 ```
