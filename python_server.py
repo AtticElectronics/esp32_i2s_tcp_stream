@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import wave
 import struct
 
-
+import whisper
 class ESP32TCP21024(ABC):
     SIGNAL_NONE = 3000
     SIGNAL_END = 3001
@@ -13,10 +13,11 @@ class ESP32TCP21024(ABC):
     __HEADER__SIZE = 2
 
 
-    def __init__(self, client_socket, client_address, callback=None):
+    def __init__(self, client_socket, client_address, openCallback=None, closeCallback=None):
         self.client_socket = client_socket
         self.client_address = client_address
-        self.callback = callback
+        self.openCallback = openCallback
+        self.closeCallback = closeCallback
 
     def send_21024(self, header, data):
         # header가 int 타입인지 확인
@@ -55,32 +56,13 @@ class ESP32TCP21024(ABC):
         self.client_socket.close()
         self.OnClosedSocket()
 
+    def OnOpenedSocket(self):
+        if self.openCallback:
+            self.openCallback()
+
     def OnClosedSocket(self):
-        if self.callback:
-            self.callback()
-
-
-
-
-class ESPTCPAudioSend(ESP32TCP21024):
-    FRAME_SIZE = 512
-    wav_file = None
-
-    def start(self):
-        signal, validData = self.recv_exact21024()
-        if signal == self.SIGNAL_MAC:
-            mac_str = ''.join('{:02X}'.format(b) for b in validData)
-            filename = f'{mac_str}.wav'
-            print(filename)
-            self.wav_file = wave.open(filename, 'rb')
-            while True:
-                frames_to_send = self.wav_file.readframes(self.FRAME_SIZE)
-                if not frames_to_send:
-                    self.send_21024(self.SIGNAL_END, b'')
-                    break
-                self.send_21024(len(frames_to_send), frames_to_send)
-        self.wav_file.close()
-        self.close()
+        if self.closeCallback:
+            self.closeCallback()
 
 class ESP32TCPAudioRecv(ESP32TCP21024):
     wav_file = None
@@ -108,11 +90,45 @@ class ESP32TCPAudioRecv(ESP32TCP21024):
                 if signal == self.SIGNAL_MAC:
                     self.mkWaveFile(validData)
                 if signal == self.SIGNAL_END:
+                    self.wav_file.close()
                     break;
                 if 0 < signal <= 1024:
                     amplified_data = self.amplify_audio_data(validData, 10)
                     self.wav_file.writeframes(amplified_data)
 
+            msg = "bye, esp32."
+            self.send_21024(len(msg.encode()),msg.encode())
+
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            self.close()
+
+
+
+class ESPTCPAudioSend(ESP32TCP21024):
+    FRAME_SIZE = 512
+    wav_file = None
+
+    def start(self):
+        try:
+            signal, validData = self.recv_exact21024()
+            if signal == self.SIGNAL_MAC:
+                mac_str = ''.join('{:02X}'.format(b) for b in validData)
+                filename = f'{mac_str}.wav'
+
+                msg = f'hi, esp32. {mac_str}.wav will send!'
+                msg_bytes = msg.encode()
+                self.send_21024(len(msg_bytes), msg_bytes)  # 시작알림
+
+                print(filename)
+                self.wav_file = wave.open(filename, 'rb')
+                while True:
+                    frames_to_send = self.wav_file.readframes(self.FRAME_SIZE)
+                    if not frames_to_send:
+                        self.send_21024(self.SIGNAL_END, b'') # 종료알림
+                        break
+                    self.send_21024(len(frames_to_send), frames_to_send) # 스트리밍
         except Exception as e:
             print(f"Error: {e}")
         finally:
@@ -140,9 +156,14 @@ class ESPTCPServer:
             client_thread = threading.Thread(target=self.handle_client, args=(client_socket, client_address))
             client_thread.start()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
+    # 첫 번째 서버 인스턴스 생성 및 스레드 시작
     server1 = ESPTCPServer('0.0.0.0', 33819, ESPTCPAudioSend)
-    server2 = ESPTCPServer('0.0.0.0', 33820, ESP32TCPAudioRecv)
-    server1.start()
-    server2.start()
+    server1_thread = threading.Thread(target=server1.start)
+    server1_thread.start()
+
+    # 두 번째 서버 인스턴스 생성 및 스레드 시작
+    server2 = ESPTCPServer('0.0.0.0', 33823, ESP32TCPAudioRecv)
+    server2_thread = threading.Thread(target=server2.start)
+    server2_thread.start()
