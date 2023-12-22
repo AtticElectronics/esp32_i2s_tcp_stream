@@ -25,8 +25,13 @@ sendVoice.closeFile();
 ## 서버코드 파일저장위치 전송완료 콜백 가능
 ```python
 if __name__ == "__main__":
+    # 첫 번째 서버 인스턴스 생성 및 스레드 시작
     server1 = ESPTCPServer('0.0.0.0', 33819, ESPTCPAudioSend)
-    server2 = ESPTCPServer('0.0.0.0', 33820, ESP32TCPAudioRecv)
-    server1.start()
-    server2.start()
+    server1_thread = threading.Thread(target=server1.start)
+    server1_thread.start()
+
+    # 두 번째 서버 인스턴스 생성 및 스레드 시작
+    server2 = ESPTCPServer('0.0.0.0', 33823, ESP32TCPAudioRecv)
+    server2_thread = threading.Thread(target=server2.start)
+    server2_thread.start()
 ```
