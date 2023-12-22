@@ -11,7 +11,7 @@ I2SAudioReceiver i2sAudioReceiver;
 void setup()
 {
   Serial.begin(115200);
-  WiFi.begin("공유기이름", "공유기비번");
+  WiFi.begin("공유기 이름", "공유기 비밀번호");
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(1000);
@@ -30,8 +30,9 @@ void setup()
 void loop()
 {
   int state = testbutton.checkState();
-  if (state == 1)
+  if (state == BUTTON_PRESSED)
   {
+    String gptmsg = i2sAudioReceiver.startSteam();
     int err = i2sAudioReceiver.playStreamData();
     if (err == 0)
     {
