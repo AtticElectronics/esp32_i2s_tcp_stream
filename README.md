@@ -1,25 +1,25 @@
-# 목적 : TCP 프로토콜로 IS2데이터를 서버로 전송
+# TCP서버와 ESP32간의 i2s오디오 전송, 수신
 
-## TCP통신관련설정 
+# 현재 클래스별 용도 설명
+## I2SAudioSender: eps32의 wav프레임을 서버측에 wav파일로저장
+## I2SAudioReceiver: 서버의 wav파일을 esp32에서 스트리밍 재생
+## python_server: 수신 데이터를 wav파일로저장, wav파일의 데이터를 전송 
+
+## 현재 제한사항
+    비트심도 : 16bit 
+    채널 : 1ch
+
+# 로드맵
+## I2SAudioSender클래스 로드맵,
+    미정
+## I2SAudioReceiver클래스 로드맵,
+    미정
+    
+## 예제 
 ```cpp
-WiFi.begin("YOUR_SSID", "YOUR_PW");
-sendVoice.setWifiClient(client);
-sendVoice.setServerAddr("192.168.0.200", 33823);
+
 ```
-## 오디오 관련설정
-```cpp
-sendVoice.setI2sBus(1);
-sendVoice.setAudioQulity(16000, 16, 1);
-sendVoice.setI2sPin(8, 19, 20);
-sendVoice.setDmaBuf(1024, 6);
-sendVoice.i2sBegin();
-```
-## 
-```cpp
-sendVoice.openFile();
-sendVoice.writeData();
-sendVoice.closeFile();
-```
+
 
 
 ## 서버코드 파일저장위치 전송완료 콜백 가능
@@ -35,3 +35,5 @@ if __name__ == "__main__":
     server2_thread = threading.Thread(target=server2.start)
     server2_thread.start()
 ```
+
+## 코드 목적: HTTP프로토콜은 느려서 TCP로 사족을 쳐내고 만들어보자, 일단 자주 쓰일것같아서 초안 느낌만 코드로작성, 시간날때나 재사용시 관련업데이트 예정
