@@ -113,13 +113,13 @@ String I2SAudioReceiver::startSteam()
 
     this->_readFully(this->tempBuffer, 1026);
     uint16_t returnValue = *((uint16_t *)this->tempBuffer);
-    String gptmsg = "";
+    String server_msg = "";
     for (int i = 2; i < 2 + returnValue; ++i)
     {
-        gptmsg += (char)tempBuffer[i];
+        server_msg += (char)tempBuffer[i];
     }
-    Serial.println(gptmsg);
-    return gptmsg;
+    Serial.println(server_msg);
+    return server_msg;
 }
 int I2SAudioReceiver::playStreamData()
 {
