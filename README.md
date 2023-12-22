@@ -1,23 +1,49 @@
 # TCP서버와 ESP32간의 i2s오디오 전송, 수신
 
 # 현재 클래스별 용도 설명
-## I2SAudioSender: eps32의 wav프레임을 서버측에 wav파일로저장
-## I2SAudioReceiver: 서버의 wav파일을 esp32에서 스트리밍 재생
-## python_server: 수신 데이터를 wav파일로저장, wav파일의 데이터를 전송 
+    ## I2SAudioSender: eps32의 wav프레임을 서버측에 wav파일로저장
+    ## I2SAudioReceiver: 서버의 wav파일을 esp32에서 스트리밍 재생
+    ## python_server: 수신 데이터를 wav파일로저장, wav파일의 데이터를 전송 
 
 ## 현재 제한사항
     비트심도 : 16bit 
     채널 : 1ch
 
 # 로드맵
-## I2SAudioSender클래스 로드맵,
+    ## I2SAudioSender클래스 로드맵,
     미정
-## I2SAudioReceiver클래스 로드맵,
+    ## I2SAudioReceiver클래스 로드맵,
     미정
     
 ## 예제 
 ```cpp
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <I2SAudioReceiver.h>
+#include <Button.h>
 
+Button testbutton(9);
+
+WiFiClient client;
+I2SAudioReceiver i2sAudioReceiver;
+
+void setup()
+{
+  WiFi.begin("공유기 이름", "공유기 비밀번호");
+  i2sAudioReceiver.setWifiClient(client);
+  i2sAudioReceiver.setServerAddr("192.168.0.200", 33819);
+  i2sAudioReceiver.i2sBegin();
+}
+
+void loop()
+{
+  int state = testbutton.checkState();
+  if (state == BUTTON_PRESSED)
+  {
+    String gptmsg = i2sAudioReceiver.startSteam();
+    int err = i2sAudioReceiver.playStreamData();
+  }
+}
 ```
 
 
