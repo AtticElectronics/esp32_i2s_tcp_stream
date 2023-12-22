@@ -118,7 +118,6 @@ String I2SAudioReceiver::startSteam()
     {
         server_msg += (char)tempBuffer[i];
     }
-    Serial.println(server_msg);
     return server_msg;
 }
 int I2SAudioReceiver::playStreamData()
