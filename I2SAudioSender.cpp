@@ -1,3 +1,4 @@
+
 #include "I2SAudioSender.h"
 
 I2SAudioSender::I2SAudioSender()
@@ -109,13 +110,17 @@ void I2SAudioSender::writeData()
     this->_sendFileData();
 }
 
-void I2SAudioSender::closeFile()
+String I2SAudioSender::closeFile()
 {
     i2s_stop(this->i2sBusNum); // TODO: 이거 정리
     this->_sendCloseFileProtocol();
     this->_disconnectServer();
+    return whisper_translate;
 }
 
+String I2SAudioSender::getWhisperString(){
+    return whisper_translate;
+}
 bool I2SAudioSender::_connectServer()
 {
     if (!this->client->connected())
@@ -156,6 +161,17 @@ void I2SAudioSender::_sendCloseFileProtocol()
     uint16_t signal_end = 3001;
     memcpy(this->dataBuffer, &signal_end, sizeof(signal_end));
     this->client->write(dataBuffer, 1026);
+
+    this->_readFully(this->dataBuffer, 1026);
+    uint16_t returnValue = *((uint16_t *)this->dataBuffer);
+    whisper_translate = "";
+    for (int i = 2; i < 2 + returnValue; ++i)
+    {
+        whisper_translate += (char)dataBuffer[i];
+    }
+    Serial.println(whisper_translate);
+    
+    // ESP_LOGI("I2SAudioSender", "서버로부터 받은 응답: %s", whisper_translate.c_str());
 }
 
 void I2SAudioSender::_disconnectServer()

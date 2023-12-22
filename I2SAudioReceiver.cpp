@@ -105,23 +105,39 @@ void I2SAudioReceiver::setServerAddr(const char *ip, uint16_t port)
     strcpy(serverIP, ip);
     serverPort = port;
 }
-
-int I2SAudioReceiver::playStreamData()
+String I2SAudioReceiver::startSteam()
 {
-    int result = 0;
     this->_connectServer();
     this->_clearI2sBus();
     this->_sendReadyToRecvProtocol();
+
+    this->_readFully(this->tempBuffer, 1026);
+    uint16_t returnValue = *((uint16_t *)this->tempBuffer);
+    String gptmsg = "";
+    for (int i = 2; i < 2 + returnValue; ++i)
+    {
+        gptmsg += (char)tempBuffer[i];
+    }
+    Serial.println(gptmsg);
+    return gptmsg;
+}
+int I2SAudioReceiver::playStreamData()
+{
+    
+    int result = 0;
     bool done = false;
+    this->client->write(tempBuffer, 1026); //더미 보내기
     while (!done)
     {
         uint16_t size = this->_receiveServerData();
         //  size가 3001이면 파일끝, -1이면 오류
         if (0 < size && size <= 1024)
         {
+            ESP_LOGE("음성 출력", "고고");
             bool success = this->_playData(size);
             if (!success)
             {
+                ESP_LOGE("소켓 나가리", "서버꺼졌니?");
                 result = 1;
                 break;
             }
@@ -140,6 +156,7 @@ int I2SAudioReceiver::playStreamData()
         int8_t event = isDmaBroken();
         if (event > 0)
         {
+            ESP_LOGE("소켓 나가리", "서버꺼졌니?");
             result = 1;
             break;
         }

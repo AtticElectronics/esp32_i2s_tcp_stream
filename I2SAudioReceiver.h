@@ -32,6 +32,7 @@ public:
     void setServerAddr(const char *ip, uint16_t port);
 
     // 수신하며 오디오 재생
+    String startSteam();
     int playStreamData();
 
 private:

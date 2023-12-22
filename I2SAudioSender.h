@@ -33,8 +33,10 @@ public:
 
     void openFile();
     void writeData();
-    void closeFile();
+    String closeFile();
     int8_t getDmaEvent();
+    String whisper_translate = "";
+    String getWhisperString();
 
 private:
     int sampleRate;
@@ -60,7 +62,6 @@ private:
     uint16_t serverPort;
 
     QueueHandle_t i2s_queue;
-
     bool _connectServer();
     void _disconnectServer();
 
