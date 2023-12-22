@@ -1,19 +1,17 @@
 # TCP서버와 ESP32간의 i2s오디오 전송, 수신
 
 # 현재 클래스별 용도 설명
-    ## I2SAudioSender: eps32의 wav프레임을 서버측에 wav파일로저장
-    ## I2SAudioReceiver: 서버의 wav파일을 esp32에서 스트리밍 재생
-    ## python_server: 수신 데이터를 wav파일로저장, wav파일의 데이터를 전송 
+    1. I2SAudioSender: eps32의 wav프레임을 서버측에 wav파일로저장
+    2. I2SAudioReceiver: 서버의 wav파일을 esp32에서 스트리밍 재생
+    3. python_server: 수신 데이터를 wav파일로저장, wav파일의 데이터를 전송 
 
 ## 현재 제한사항
     비트심도 : 16bit 
     채널 : 1ch
 
-# 로드맵
-    ## I2SAudioSender클래스 로드맵,
-    미정
-    ## I2SAudioReceiver클래스 로드맵,
-    미정
+## 로드맵
+    I2SAudioSender클래스 로드맵 : 미정
+    I2SAudioReceiver클래스 로드맵 : 미정
     
 ## 예제 
 ```cpp
@@ -45,8 +43,6 @@ void loop()
   }
 }
 ```
-
-
 
 ## 서버코드
 ```python
