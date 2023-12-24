@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 import wave
 import struct
+import socket
+import threading
 
-import whisper
 class ESP32TCP21024(ABC):
     SIGNAL_NONE = 3000
     SIGNAL_END = 3001
@@ -136,8 +137,6 @@ class ESPTCPAudioSend(ESP32TCP21024):
             self.close()
 
 
-import socket
-import threading
 
 class ESPTCPServer:
     def __init__(self, host, port, audio_class):
