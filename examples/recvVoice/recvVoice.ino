@@ -22,7 +22,7 @@ void setup()
 
   i2sAudioReceiver.setI2sBus(1);                  // 0 or 1
   i2sAudioReceiver.setAudioQuality(16000, 16, 1); // int sample_rate, int sample_size(only 16), int channels(only 1)
-  i2sAudioReceiver.setI2sPin(18, 17, 16);         // int sck, int sd, int ws
+  i2sAudioReceiver.setI2sPin(8, 19, 20);         // int sck, int sd, int ws
   i2sAudioReceiver.setDmaBuf(1024, 10);           // int len(only 1024 tested), int count
   i2sAudioReceiver.i2sBegin();
 }
